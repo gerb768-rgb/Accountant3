@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>نظام ERP متكامل</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- مكتبة QR Code للكاميرا -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle">☰</button>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <span>📋 نظام ERP</span>
+        <button class="close-sidebar" id="closeSidebar">✖</button>
+    </div>
+    <div class="sidebar-item active" data-tab="dashboard">📊 لوحة التحكم</div>
+    <div class="sidebar-item" data-tab="pos">🛒 نقطة البيع</div>
+    <div class="sidebar-item" data-tab="products">📦 المخزون والرفوف</div>
+    <div class="sidebar-item" data-tab="customers">👥 العملاء والمديونيات</div>
+    <div class="sidebar-item" data-tab="suppliers">🚚 الموردين والدائنون</div>
+    <div class="sidebar-item" data-tab="inventory">📒 دفتر الجرد</div>
+    <div class="sidebar-item" data-tab="employees">👔 الموظفين والصلاحيات</div>
+    <div class="sidebar-item" data-tab="reports">📈 التقارير</div>
+    <div class="sidebar-item" data-tab="barcode">📷 ماسح الباركود</div>
+    <div class="sidebar-item" data-tab="settings">⚙️ الإعدادات</div>
+</div>
+
+<div class="main-content" id="mainContent">
+    <!-- الأقسام -->
+    <div id="dashboard" class="tab-pane active">
+        <h2>لوحة التحكم</h2>
+        <div class="dashboard-cards" id="dashCards"></div>
+        <canvas id="salesChart" width="400" height="200" style="max-width:100%; height:auto;"></canvas>
+        <div><strong>آخر 5 مبيعات:</strong> <ul id="recentSales"></ul></div>
+    </div>
+
+    <div id="pos" class="tab-pane">
+        <h2>نقطة البيع</h2>
+        <div class="grid-2cols">
+            <div><h3>المنتجات</h3><input type="text" id="posSearch" placeholder="بحث بالاسم أو الباركود"><div id="posProductsList"></div></div>
+            <div><h3>السلة</h3><select id="customerSelect"></select><div id="cartItems"></div><div>الإجمالي: <span id="cartTotal">0</span></div><button id="completeSale" class="success-btn">💰 إتمام البيع وطباعة PDF</button></div>
+        </div>
+    </div>
+
+    <div id="products" class="tab-pane">
+        <h2>إدارة المخزون والرفوف</h2>
+        <input type="text" id="prodName" placeholder="اسم المنتج"><input type="text" id="prodBarcode" placeholder="باركود"><input type="number" id="prodPrice" placeholder="السعر"><input type="number" id="prodStock" placeholder="الكمية"><input type="text" id="prodShelf" placeholder="الرف"><button id="addProductBtn">➕ إضافة/تحديث</button>
+        <table id="productsTable"><thead><th>الاسم</th><th>باركود</th><th>السعر</th><th>الكمية</th><th>الرف</th><th>إجراء</th></thead><tbody></tbody></table>
+    </div>
+
+    <div id="customers" class="tab-pane">
+        <h2>العملاء والمديونيات</h2>
+        <input type="text" id="custName" placeholder="الاسم"><input type="text" id="custPhone" placeholder="الهاتف"><input type="number" id="custDebt" placeholder="المديونية"><button id="addCustomerBtn">إضافة</button>
+        <table id="customersTable"><thead><th>الاسم</th><th>الهاتف</th><th>المديونية</th><th>إجراء</th></thead><tbody></tbody></table>
+        <h3>تسديد مديونية</h3><select id="debtCustomerSelect"></select><input type="number" id="paymentAmount" placeholder="المبلغ"><button id="payDebtBtn">تسديد</button>
+    </div>
+
+    <div id="suppliers" class="tab-pane">
+        <h2>الموردين والدائنون</h2>
+        <input type="text" id="supName" placeholder="الاسم"><input type="text" id="supPhone" placeholder="الهاتف"><input type="number" id="supCredit" placeholder="دائن له"><button id="addSupplierBtn">إضافة</button>
+        <table id="suppliersTable"><thead><th>الاسم</th><th>الهاتف</th><th>الدائن</th><th>إجراء</th></thead><tbody></tbody></table>
+    </div>
+
+    <div id="inventory" class="tab-pane">
+        <h2>دفتر الجرد</h2><button id="startInventoryBtn">بدء جرد جديد</button><div id="inventoryList"></div>
+    </div>
+
+    <div id="employees" class="tab-pane">
+        <h2>الموظفين والصلاحيات</h2>
+        <input type="text" id="empName" placeholder="الاسم"><select id="empRole"><option value="cashier">كاشير</option><option value="manager">مدير</option></select><input type="password" id="empPassword" placeholder="كلمة السر"><button id="addEmployeeBtn">إضافة</button>
+        <table id="employeesTable"><thead><th>الاسم</th><th>الصلاحية</th><th>حذف</th></thead><tbody></tbody></table>
+        <h3>تسجيل الدخول</h3><input type="text" id="loginName" placeholder="اسم المستخدم"><input type="password" id="loginPass" placeholder="كلمة السر"><button id="loginBtn">دخول</button><div id="currentUser"></div>
+    </div>
+
+    <div id="reports" class="tab-pane">
+        <h2>التقارير والرسوم البيانية</h2><canvas id="salesTrendChart"></canvas><div id="reportSummary"></div>
+    </div>
+
+    <div id="barcode" class="tab-pane">
+        <h2>ماسح الباركود</h2><div id="barcode-reader"></div><div id="barcodeResult"></div><button id="startScanner">تشغيل الكاميرا</button><button id="stopScanner">إيقاف</button>
+    </div>
+
+    <div id="settings" class="tab-pane">
+        <h2>الإعدادات</h2><button id="resetDataBtn" class="danger-btn">إعادة ضبط كل البيانات</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
